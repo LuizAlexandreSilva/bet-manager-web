@@ -1,11 +1,8 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { AuthProvider } from './auth';
 
-
-const AppProvider: React.FC = ({ children }) => (
-  <AuthProvider>
-    {children}
-  </AuthProvider>
-);
+function AppProvider({ children }: any): ReactElement {
+  return <AuthProvider>{children}</AuthProvider>;
+}
 
 export default AppProvider;

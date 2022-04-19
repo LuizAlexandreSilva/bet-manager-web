@@ -1,8 +1,17 @@
+import { ChakraProvider, CSSReset } from '@chakra-ui/react';
 import React from 'react';
+import AppProvider from './hooks';
+import Routes from './routes';
+import { theme } from './styles/theme';
 
 function App() {
   return (
-    <h1>Hello world</h1>
+    <ChakraProvider theme={theme}>
+      <CSSReset />
+      <AppProvider>
+        <Routes />
+      </AppProvider>
+    </ChakraProvider>
   );
 }
 

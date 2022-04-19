@@ -1,16 +1,24 @@
 import React from 'react';
-import { Routes as RDOMRoutes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes as RDOMRoutes } from 'react-router-dom';
+import { useAuth } from '../hooks/auth';
 import Dashboard from '../pages/Dashboard';
 import SignIn from '../pages/SignIn';
-import Route from './Route';
+import { ProtectedRoute } from './ProtectedRoute';
 
+const Routes: React.FC = () => {
+  const { user } = useAuth();
 
-const Routes: React.FC = () => (
-  <RDOMRoutes>
-    <Route path="/" component={SignIn} />
+  return (
+    <BrowserRouter>
+      <RDOMRoutes>
+        <Route path="/signin" element={<SignIn />} />
 
-    <Route path="/dashboard" component={Dashboard} isPrivate />
-  </RDOMRoutes>
-);
+        <Route element={<ProtectedRoute isAllowed={!!user} />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+      </RDOMRoutes>
+    </BrowserRouter>
+  );
+};
 
 export default Routes;
