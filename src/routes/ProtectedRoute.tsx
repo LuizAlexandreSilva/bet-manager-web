@@ -1,4 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
+import { SignedLayout } from '../components/SignedLayout';
 
 type Props = {
   isAllowed: boolean;
@@ -15,5 +16,5 @@ export const ProtectedRoute = ({
     return <Navigate to={redirectPath} replace />;
   }
 
-  return children || <Outlet />;
+  return <SignedLayout>{children || <Outlet />}</SignedLayout>;
 };
