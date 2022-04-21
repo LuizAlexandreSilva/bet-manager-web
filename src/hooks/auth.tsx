@@ -48,19 +48,19 @@ export function AuthProvider({ children }: any): ReactElement {
   });
 
   const signIn = useCallback(async ({ email, password }: SignInCredentials) => {
-    const response = await api.post('sessions', {
+    const response = await api.post('auth/login', {
       email,
       password,
     });
 
-    const { token, user } = response.data;
+    const { accessToken, user } = response.data;
 
-    localStorage.setItem(`${APP_NAME}:token`, token);
+    localStorage.setItem(`${APP_NAME}:token`, accessToken);
     localStorage.setItem(`${APP_NAME}:user`, JSON.stringify(user));
 
-    api.defaults.headers.common.authorization = `Bearer ${token}`;
+    api.defaults.headers.common.authorization = `Bearer ${accessToken}`;
 
-    setData({ token, user });
+    setData({ token: accessToken, user });
   }, []);
 
   const signOut = useCallback(() => {

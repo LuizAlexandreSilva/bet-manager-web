@@ -6,9 +6,12 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  useToast,
 } from '@chakra-ui/react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/auth';
 
 type FormData = {
   email: string;
@@ -21,27 +24,41 @@ const SignIn = () => {
     register,
     formState: { errors, isSubmitting },
   } = useForm<FormData>();
-  // const router = useRouter();
+  const { signIn, user } = useAuth();
+  const navigate = useNavigate();
+  const toast = useToast();
 
-  const onSubmit = useCallback(async (formData: FormData) => {
-    // const res = await signIn<'credentials'>('credentials', {
-    //   redirect: false,
-    //   callbackUrl: '/dashboard',
-    //   email: formData.email,
-    //   password: formData.password,
-    // });
-    // if (res?.error) {
-    //   toast();
-    // }
-    // if (res?.url) {
-    //   router.push(res.url);
-    // }
-  }, []);
+  const onSubmit = useCallback(
+    async (formData: FormData) => {
+      try {
+        const { email, password } = formData;
+        await signIn({ email, password });
+
+        navigate('/dashboard', { replace: true });
+      } catch (err: any) {
+        toast({
+          id: 'sign-in-error',
+          title:
+            err?.response?.data?.message ||
+            'Ocorreu um erro inesperado. Tente novamente.',
+          status: 'error',
+          position: 'top-right',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    },
+    [signIn, navigate, toast],
+  );
+
+  useEffect(() => {
+    if (user) navigate('/dashboard', { replace: true });
+  }, [user, navigate]);
 
   return (
     <Flex h="100vh" align="center" justify="center">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Box maxW="container.xs" borderWidth="1px" borderRadius="lg" p="6">
+        <Box maxW="container" borderWidth="1px" borderRadius="lg" p="6">
           <FormControl isInvalid={!!errors.email}>
             <FormLabel htmlFor="email">E-mail</FormLabel>
             <Input
