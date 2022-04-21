@@ -5,13 +5,15 @@ import {
   Flex,
   FlexProps,
   Icon,
-  Link,
+  Menu,
+  MenuItem,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { ReactText } from 'react';
+import { MouseEvent, ReactText, useCallback } from 'react';
 import { IconType } from 'react-icons';
 import { BsBank2, BsCardList, BsHouseDoorFill } from 'react-icons/bs';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 type SidebarProps = {
   onClose: () => void;
@@ -20,32 +22,47 @@ type SidebarProps = {
 type LinkItemProps = {
   name: string;
   icon: IconType;
+  route: string;
 };
 
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Painel', icon: BsHouseDoorFill },
-  { name: 'Apostas', icon: BsCardList },
-  { name: 'Saques/Depósitos', icon: BsBank2 },
+  { name: 'Painel', icon: BsHouseDoorFill, route: '/dashboard' },
+  { name: 'Apostas', icon: BsCardList, route: '/bets' },
+  { name: 'Saques/Depósitos', icon: BsBank2, route: '/bank' },
 ];
 
 interface NavItemProps extends FlexProps {
   icon: IconType;
   children: ReactText;
+  route: string;
+  pathname: string;
 }
-const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
+const NavItem = ({
+  icon,
+  route,
+  pathname,
+  children,
+  ...rest
+}: NavItemProps) => {
+  const navigate = useNavigate();
+
+  const handleClick = useCallback(
+    (e: MouseEvent) => {
+      if (pathname === route) e.preventDefault();
+      navigate(route);
+    },
+    [route, pathname, navigate],
+  );
+
   return (
-    <Link
-      href="/"
-      style={{ textDecoration: 'none' }}
-      _focus={{ boxShadow: 'none' }}
-    >
+    <MenuItem onClick={(e) => handleClick(e)} _focus={{ boxShadow: 'none' }}>
       <Flex
         align="center"
         p="4"
-        mx="4"
         borderRadius="lg"
         role="group"
         cursor="pointer"
+        w="100%"
         _hover={{
           bg: 'cyan.400',
           color: 'white',
@@ -62,13 +79,15 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
             as={icon}
           />
         )}
-        {children}
+        <Text as={route === pathname ? 'strong' : 'span'}>{children}</Text>
       </Flex>
-    </Link>
+    </MenuItem>
   );
 };
 
 export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const { pathname } = useLocation();
+
   return (
     <Box
       transition="3s ease"
@@ -86,11 +105,19 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
-          {link.name}
-        </NavItem>
-      ))}
+
+      <Menu>
+        {LinkItems.map((link) => (
+          <NavItem
+            key={link.name}
+            icon={link.icon}
+            route={link.route}
+            pathname={pathname}
+          >
+            {link.name}
+          </NavItem>
+        ))}
+      </Menu>
     </Box>
   );
 };
