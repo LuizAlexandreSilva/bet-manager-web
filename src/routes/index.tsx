@@ -6,6 +6,7 @@ import {
   Routes as RDOMRoutes,
 } from 'react-router-dom';
 import { useAuth } from '../hooks/auth';
+import { Bets } from '../pages/Bets';
 import Dashboard from '../pages/Dashboard';
 import SignIn from '../pages/SignIn';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -20,6 +21,8 @@ const Routes: React.FC = () => {
 
         <Route element={<ProtectedRoute isAllowed={!!user} />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/bets" element={<Bets />} />
+          <Route path="/bank" element={<Dashboard />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </RDOMRoutes>
