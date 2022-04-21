@@ -1,5 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes as RDOMRoutes } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes as RDOMRoutes,
+} from 'react-router-dom';
 import { useAuth } from '../hooks/auth';
 import Dashboard from '../pages/Dashboard';
 import SignIn from '../pages/SignIn';
@@ -16,6 +21,7 @@ const Routes: React.FC = () => {
         <Route element={<ProtectedRoute isAllowed={!!user} />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </RDOMRoutes>
     </BrowserRouter>
   );
