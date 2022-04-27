@@ -9,6 +9,7 @@ export enum TransactionStatus {
   PENDING = 'PENDING',
   WON = 'WON',
   LOSS = 'LOSS',
+  DRAW = 'DRAW',
 }
 
 export type Transaction = {
@@ -18,17 +19,13 @@ export type Transaction = {
   date: string;
   stake: number;
   odd: number;
+  result: number;
   status: TransactionStatus;
   note?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  sportId: string;
-  Sport: any;
-  bankrollId?: string;
-  Bankroll?: any;
-  competitionId?: string;
-  Competition?: any;
+  sportId?: string;
+  Sport?: any;
   marketId?: string;
   Market?: any;
-  MultipleSelections?: [];
 };

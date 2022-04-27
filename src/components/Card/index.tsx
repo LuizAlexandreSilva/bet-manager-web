@@ -1,7 +1,12 @@
-import { Box } from '@chakra-ui/react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import React, { ReactNode } from 'react';
 
-export default function Card({ children }: { children: ReactNode }) {
+type Props = {
+  children: ReactNode;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+} & BoxProps;
+
+export default function Card({ children, ...props }: Props) {
   return (
     <Box
       borderWidth="1px"
@@ -9,6 +14,7 @@ export default function Card({ children }: { children: ReactNode }) {
       width="100%"
       bg="whiteAlpha.900"
       p="4"
+      {...props}
     >
       {children}
     </Box>
