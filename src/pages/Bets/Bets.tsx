@@ -1,12 +1,14 @@
-import { Box, Button, Heading } from '@chakra-ui/react';
+import { Box, Button, Heading, useDisclosure } from '@chakra-ui/react';
 import { subMonths } from 'date-fns/esm';
 import { ptBR } from 'date-fns/locale';
 import React, { forwardRef, useCallback, useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { BsPlus } from 'react-icons/bs';
 import Card from '../../components/Card';
+import { useAuth } from '../../hooks/auth';
 import { Transaction } from '../../models/transaction';
 import api from '../../services/apiClient';
+import BetModal from './BetModal';
 import ListTable from './ListTable';
 
 type LoadBetsParams = {
@@ -22,6 +24,16 @@ export default function Bets() {
   const [endDate, setEndDate] = useState<Date>();
   const [isLoadingPendingBets, setIsLoadingPendingBets] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [markets, setMarkets] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const { user } = useAuth();
+
+  const {
+    isOpen: isModalOpen,
+    onOpen: onModalOpen,
+    onClose: onModalClose,
+  } = useDisclosure();
 
   const loadPendingBets = useCallback(async () => {
     try {
@@ -40,15 +52,12 @@ export default function Bets() {
   const loadBets = useCallback(async ({ start, end }: LoadBetsParams) => {
     try {
       setIsLoading(true);
-      const response = await api.get<Transaction[]>(
-        '/transactions/bets?bankrollId=6744821c-7b72-401d-b2bf-04fb77fdf291',
-        {
-          params: {
-            startDate: start,
-            endDate: end,
-          },
+      const response = await api.get<Transaction[]>('/transactions/bets', {
+        params: {
+          startDate: start,
+          endDate: end,
         },
-      );
+      });
       setBets(response.data);
     } catch (err) {
       console.error(JSON.stringify(err));
@@ -56,6 +65,24 @@ export default function Bets() {
       setIsLoading(false);
     }
   }, []);
+
+  const loadMarkets = useCallback(async () => {
+    const response = await api.get<[]>('/markets', {
+      params: {
+        userId: user.id,
+      },
+    });
+    setMarkets(response.data);
+  }, [user.id]);
+
+  const loadCategories = useCallback(async () => {
+    const response = await api.get<[]>('/categories', {
+      params: {
+        userId: user.id,
+      },
+    });
+    setCategories(response.data);
+  }, [user.id]);
 
   useEffect(() => {
     const today = new Date();
@@ -65,7 +92,9 @@ export default function Bets() {
 
     loadPendingBets();
     loadBets({ start: monthAgo, end: today });
-  }, [loadBets, loadPendingBets]);
+    loadMarkets();
+    loadCategories();
+  }, [loadBets, loadPendingBets, loadMarkets, loadCategories]);
 
   const onChange = useCallback(
     (dates: [Date | null, Date | null]) => {
@@ -80,6 +109,10 @@ export default function Bets() {
     [loadBets],
   );
 
+  const handleClickNewBet = useCallback(() => {
+    onModalOpen();
+  }, [onModalOpen]);
+
   const ButtonDatePicker = forwardRef(({ value, onClick }: any, ref) => (
     <Button onClick={onClick} ref={ref as any} variant="outline">
       {value}
@@ -88,7 +121,11 @@ export default function Bets() {
 
   return (
     <>
-      <Button colorScheme="blue" leftIcon={<BsPlus size={20} />}>
+      <Button
+        onClick={() => handleClickNewBet()}
+        colorScheme="blue"
+        leftIcon={<BsPlus size={20} />}
+      >
         Nova aposta
       </Button>
       <Card mt={8}>
@@ -120,6 +157,12 @@ export default function Bets() {
         </Box>
         <ListTable isLoading={isLoading} data={bets} pendingTable={false} />
       </Card>
+      <BetModal
+        isOpen={isModalOpen}
+        onClose={onModalClose}
+        markets={markets}
+        categories={categories}
+      />
     </>
   );
 }

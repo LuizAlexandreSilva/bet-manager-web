@@ -60,7 +60,6 @@ export default function ListTable({ data, isLoading, pendingTable }: Props) {
           <Tr>
             <Th>Evento</Th>
             <Th>Data</Th>
-            <Th>Mercado</Th>
             <Th isNumeric>Valor</Th>
             <Th isNumeric>Odd</Th>
             {!pendingTable && <Th isNumeric>Resultado</Th>}
@@ -78,8 +77,7 @@ export default function ListTable({ data, isLoading, pendingTable }: Props) {
           {data?.map((item) => (
             <Tr key={item.id}>
               <Td>{item.eventName}</Td>
-              <Td>{format(new Date(item.date), 'dd/MM/yyyy HH:mm')}</Td>
-              <Td>{item.Market?.name || '-'} </Td>
+              <Td>{format(new Date(item.date), 'dd/MM/yyyy')}</Td>
               <Td isNumeric>{formatMoney(item.stake)}</Td>
               <Td isNumeric>{item.odd}x</Td>
               {item.status !== TransactionStatus.PENDING && (
